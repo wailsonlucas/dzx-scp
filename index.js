@@ -7,7 +7,7 @@ const level = "1ap";
 const subject = "mathematiques";
 const condition_1 = "الفصل"; // First condition
 const condition_2 = "الأول";  // Second condition
-const outputFile = `${level}-${subject}.txt`; 
+const outputFile = `${level}-${subject}-${condition_1}-${condition_2}.txt`; 
 
 async function scrapeLinks() {
     const browser = await puppeteer.launch();
