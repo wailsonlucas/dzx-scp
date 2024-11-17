@@ -1,10 +1,12 @@
 const puppeteer = require('puppeteer');
 const fs = require('fs');
 
-const url = 'https://www.dzexams.com/ar/1ap/mathematiques'; // Replace with the target website's URL
+const url = 'https://www.dzexams.com/ar/1ap/mathematiques'; // Target website's URL
 const divId = 'panel-sujets'; // ID of the div to search within
-const level = "1ap"
-const subject = "mathematiques"
+const level = "1ap";
+const subject = "mathematiques";
+const condition_1 = "الفصل"; // First condition
+const condition_2 = "الأول";  // Second condition
 const outputFile = `${level}-${subject}.txt`; 
 
 async function scrapeLinks() {
@@ -18,15 +20,35 @@ async function scrapeLinks() {
         // Wait for the div with the specified ID to load
         await page.waitForSelector(`#${divId}`, { timeout: 30000 });
 
-        // Extract href attributes of all <a> elements inside the specified div
+        // Extract href attributes and text content of all <a> elements inside the specified div
         const links = await page.$$eval(`#${divId} a`, anchors => 
-            anchors.map(anchor => anchor.href) // Get the href attribute of each <a> element
+            anchors.map(anchor => ({
+                href: anchor.href,
+                text: anchor.textContent.trim() // Get the text content of each <a> element
+            }))
         );
 
-        // Loop through each link to fetch the download link
-        for (const link of links) {
+
+        // Filter links based on the presence of both conditions in the text
+        const filteredLinks = links.filter(link => 
+            link.text.includes(condition_1) && link.text.includes(condition_2)
+        );
+
+            console.log(`عدد المواضيع: ${filteredLinks.length}`);
+            console.log(`المستوى: ${level}`);
+            console.log(`الموادة: ${subject}`);
+            console.log(`الشرط 01: ${condition_1}`);
+            console.log(`الشؤط 02: ${condition_2}`);
+
+        console.log(filteredLinks);
+
+        // Loop through each filtered link to fetch the download link
+        for (const { href, text } of filteredLinks) {
+            // Log the anchor text and URL
+            // console.log(`Processing link: ${text} - URL: ${href}`);
+
             // Navigate to the link
-            await page.goto(link, { waitUntil: 'networkidle2', timeout: 30000 });
+            await page.goto(href, { waitUntil: 'networkidle2', timeout: 30000 });
 
             // Wait for the actions-download link to appear
             const downloadLinkExists = await page.$('#actions-download');
@@ -36,10 +58,10 @@ async function scrapeLinks() {
                 const downloadLink = await page.$eval('#actions-download', a => a.href);
 
                 // Log and write the download link to the file immediately
-                console.log(`Found download link: ${downloadLink}`);
-                fs.appendFileSync(outputFile, `${downloadLink}\n`, 'utf8'); // Append the link to the file
+                console.log(`رابط : ${downloadLink}`);
+                fs.appendFileSync(outputFile, `${downloadLink}\n`, 'utf8'); // Append the link with text to the file
             } else {
-                console.log(`No download link found for: ${link}`);
+                console.log(`No download link found for: ${text} - URL: ${href}`);
             }
         }
 
