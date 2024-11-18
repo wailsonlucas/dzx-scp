@@ -3,12 +3,17 @@ const fs = require('fs');
 
 const url = 'https://www.dzexams.com/ar/1ap/mathematiques'; // Target website's URL
 const divId = 'panel-sujets'; // ID of the div to search within
+
+
+// الإعدادت
 const level = "1ap";
 const subject = "mathematiques";
-const condition_1 = "الفصل"; // First condition
-const condition_2 = "الأول";  // Second condition
-const outputFile = `${level}-${subject}-${condition_1}-${condition_2}.txt`; 
+const condition_2 = "الأول"; 
+const type = "فروض و اختبارات"
 
+
+
+const outputFile = `${level}-${subject}-الفصل-${condition_2}-${type}.txt`; 
 async function scrapeLinks() {
     const browser = await puppeteer.launch();
     const page = await browser.newPage();
@@ -22,25 +27,27 @@ async function scrapeLinks() {
 
         // Extract href attributes and text content of all <a> elements inside the specified div
         const links = await page.$$eval(`#${divId} a`, anchors => 
-            anchors.map(anchor => ({
-                href: anchor.href,
-                text: anchor.textContent.trim() // Get the text content of each <a> element
-            }))
+            anchors.map(anchor => {
+                return {
+                    href: anchor.href,
+                    text: anchor.textContent.trim() // Get the text content of each <a> element
+                }
+            })
         );
 
-
         // Filter links based on the presence of both conditions in the text
-        const filteredLinks = links.filter(link => 
-            link.text.includes(condition_1) && link.text.includes(condition_2)
+        const filteredLinks = links.filter(link => {
+                return link.text.includes(condition_2) 
+            }
         );
 
             console.log(`عدد المواضيع: ${filteredLinks.length}`);
             console.log(`المستوى: ${level}`);
-            console.log(`الموادة: ${subject}`);
-            console.log(`الشرط 01: ${condition_1}`);
-            console.log(`الشؤط 02: ${condition_2}`);
+            console.log(`المادة: ${subject}`);
+            console.log(`نوع: ${type}`);
+            console.log(`الفصل: ${condition_2}`);
 
-        console.log(filteredLinks);
+            // console.log(filteredLinks);
 
         // Loop through each filtered link to fetch the download link
         for (const { href, text } of filteredLinks) {
