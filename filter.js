@@ -28,7 +28,7 @@ fs.readFile('data.txt', 'utf8', (err, data) => {
     // Write the filtered links to output.txt
     fs.writeFile(`${param}.txt`, filteredLinks.join('\n'), (err) => {
         if (err) {
-            console.error(errorEmoji + 'Error writing to the file:', err);
+            console.error(`${errorEmoji} Error writing to the file:, ${err}`);
             return;
         }
         console.log(`${successEmoji} Filtered links have been written to output.txt`);
