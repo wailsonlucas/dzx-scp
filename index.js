@@ -1,8 +1,11 @@
 const axios = require('axios');
 const cheerio = require('cheerio');
 const fs = require('fs');
+const successEmoji = '✅';
+const errorEmoji = '❌';
+const yey = '🎉 ';
 
-const url = 'https://www.ency-education.com/3am-exams-sciences.html';
+const url = 'https://www.ency-education.com/1am-exams-sciences.html';
 const subject = 'sciences';
 const outputFilePath = 'data.txt'; // Path to the output file
 
@@ -23,19 +26,19 @@ async function scrapeWebsite() {
             $('a').each((index, element) => {
                 const href = $(element).attr('href');
                 if (href && href.includes(subject)) {
-                    console.log(href)
+                    console.log(`${yey} ${href}`)
                     links.push(href);
                 }
             });
 
             // Write the filtered links to a text file
             fs.writeFileSync(outputFilePath, links.join('\n'), 'utf8');
-            console.log(`Links containing '${subject}' written to ${outputFilePath}`);
+            console.log(`${yey} Links containing '${subject}' written to ${outputFilePath}`);
         } else {
-            console.error(`Error: Received status code ${response.status}`);
+            console.error(`${errorEmoji} Error: Received status code ${response.status}`);
         }
     } catch (error) {
-        console.error(`Error fetching the URL: ${error.message}`);
+        console.error(`${errorEmoji} Error fetching the URL: ${error.message}`);
     }
 }
 

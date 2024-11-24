@@ -1,9 +1,10 @@
 const fs = require('fs');
-
+const successEmoji = '✅';
+const errorEmoji = '❌';
 // Get the parameter from command line arguments
 const args = process.argv.slice(2);
 const param = args[0]; // The parameter to filter the links
-const output = args[1]; // The parameter to filter the links
+// const output = args[1]; // The parameter to filter the links
 
 if (!param) {
     console.error('Please provide a parameter to filter the links.');
@@ -25,11 +26,11 @@ fs.readFile('data.txt', 'utf8', (err, data) => {
     const filteredLinks = lines.filter(line => line.includes(param));
 
     // Write the filtered links to output.txt
-    fs.writeFile(`${output}.txt`, filteredLinks.join('\n'), (err) => {
+    fs.writeFile(`${param}.txt`, filteredLinks.join('\n'), (err) => {
         if (err) {
-            console.error('Error writing to the file:', err);
+            console.error(errorEmoji + 'Error writing to the file:', err);
             return;
         }
-        console.log(`Filtered links have been written to output.txt`);
+        console.log(`${successEmoji} Filtered links have been written to output.txt`);
     });
 });
